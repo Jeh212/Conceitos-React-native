@@ -10,17 +10,51 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-export default function App() {
-  async function handleLikeRepository(id) {
-    // Implement "Like Repository" functionality
+const [ repositories, setRepositories ]= useState([]);
+
+   //LIstar TOdos os repositorios
+   useEffect(()=>{
+    api.get('repositories').then(response =>
+      {setRepositories(response.data)})
+   },[]);
+
+  async function handleAddrepositories() {
+
+   //Pegando dados
+ const objeto =  await api.post('repositories',{
+
+   
+      title: 'Escola de Programação',
+      url: 'url-teste',
+      techs: [ 'REactjs', 'React-Native']
+   });
+   const repoNew = objeto.data;
+
+    setRepositories([...repositories,repoNew]);
+    
+
   }
 
+export default function App(){
+  async function handleLikeRepository(id) {
+      console.log(id)
+
+      const response = await api.put(`repositories/${id}/likes`);  
+      const repository = repositories.find(repository=>repository.id === id);
+      const newRepo = repositories;
+
+      newRepo[repository] = response.data;
+
+      setRepositories([...newRepo])
+  
+
+  }
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
       <SafeAreaView style={styles.container}>
         <View style={styles.repositoryContainer}>
-          <Text style={styles.repository}>Repository 1</Text>
+          <Text style={styles.repository}>repositories.title</Text>
 
           <View style={styles.techsContainer}>
             <Text style={styles.tech}>
@@ -53,7 +87,8 @@ export default function App() {
       </SafeAreaView>
     </>
   );
-}
+  }
+
 
 const styles = StyleSheet.create({
   container: {
